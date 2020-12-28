@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1"
+             xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+    <persistence-unit name="ogm-jpa-without-jta" transaction-type="RESOURCE_LOCAL">
+        <!--  persistence-unit name="ogm-jpa-tutorial" transaction-type="JTA"-->
+        <!-- Use Hibernate OGM provider: configuration will be transparent -->
+        <provider>org.hibernate.ogm.jpa.HibernateOgmPersistence</provider>
+        <class>com.packtpub.infinispan.chapter10.domain.Seat</class>
+        <class>com.packtpub.infinispan.chapter10.domain.TicketCategory</class>
+        <class>com.packtpub.infinispan.chapter10.domain.Ticket</class>
+        <class>com.packtpub.infinispan.chapter10.domain.Section</class>
+        <class>com.packtpub.infinispan.chapter10.domain.Venue</class>
+        <class>com.packtpub.infinispan.chapter10.domain.User</class>
+        <class>com.packtpub.infinispan.chapter10.domain.UserGroup</class>
+        <properties>
+            <!-- Configure Hibernate OGM to work with Infinispan. -->
+            <property name="hibernate.ogm.datastore.provider"
+                      value="org.hibernate.ogm.datastore.infinispan.impl.InfinispanDatastoreProvider"/>
+            <!-- Point to a custom Infinispan configuration file -->
+            <property name="hibernate.ogm.infinispan.configuration_resource_name"
+                      value="META-INF/sample.xml"/>
+            <!-- defines which JTA Transaction we plan to use -->
+            <!--property name="hibernate.transaction.jta.platform"
+                value="org.hibernate.service.jta.platform.internal.JBossStandAloneJtaPlatform" / -->
+            <!-- Infinispan -->
+            <property name="hibernate.search.default.directory_provider" value="filesystem"/>
+            <property name="hibernate.search.default.indexBase" value="./tmp/.hibernate_ogm_demo_luceneindexes"/>
+        </properties>
+    </persistence-unit>
+    <!-- persistence-unit name="ogm-jpa-with-jta" transaction-type="JTA">
+        <provider>org.hibernate.ogm.jpa.HibernateOgmPersistence</provider>
+		<properties>
+			<property name="hibernate.ogm.datastore.provider"
+				value="org.hibernate.ogm.datastore.infinispan.impl.InfinispanDatastoreProvider" />
+			<property name="hibernate.ogm.infinispan.configuration_resource_name"
+				value="META-INF/sample.xml" />
+			<property name="hibernate.transaction.jta.platform"
+				value="org.hibernate.service.jta.platform.internal.JBossStandAloneJtaPlatform" />
+		</properties>
+	</persistence-unit-->
+</persistence>

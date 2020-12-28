@@ -1,0 +1,102 @@
+<infinispan>
+    <global>
+        <globalJmxStatistics
+                enabled="true"
+                jmxDomain="org.infinispan"
+                allowDuplicateDomains="true"
+                cacheManagerName="CacheManagerChapter6"/>
+    </global>
+
+    <default>
+        <jmxStatistics enabled="true"/>
+    </default>
+
+    <namedCache name="transactionalPessimistic">
+        <jmxStatistics enabled="true"/>
+        <transaction transactionMode="TRANSACTIONAL" lockingMode="PESSIMISTIC"/>
+    </namedCache>
+
+
+    <namedCache name="batchingCacheWithEvictionAndPassivation">
+        <jmxStatistics enabled="true"/>
+        <eviction maxEntries="10" strategy="LRU"/>
+        <expiration wakeUpInterval="500" lifespan="60000" maxIdle="1000"/>
+        <invocationBatching enabled="true"/>
+        <transaction
+                transactionManagerLookupClass="org.infinispan.transaction.lookup.JBossStandaloneJTAManagerLookup"
+                transactionMode="TRANSACTIONAL" lockingMode="OPTIMISTIC"/>
+        <persistence passivation="true">
+            <store class="org.infinispan.persistence.file.SingleFileStore"
+                   fetchPersistentState="false" preload="true" shared="false"
+                   purgeOnStartup="true" ignoreModifications="false">
+                <async enabled="true" flushLockTimeout="12321"
+                       shutdownTimeout="321" modificationQueueSize="123" threadPoolSize="23"/>
+                <properties>
+                    <property name="location" value="/tmp/cache/backup"/>
+                </properties>
+            </store>
+        </persistence>
+    </namedCache>
+
+
+    <namedCache name="transactionCache">
+        <jmxStatistics enabled="true"/>
+        <transaction
+                transactionManagerLookupClass="org.infinispan.transaction.lookup.JBossStandaloneJTAManagerLookup"
+                transactionMode="TRANSACTIONAL" lockingMode="OPTIMISTIC"/>
+    </namedCache>
+
+    <namedCache name="transactionCacheWithLocking">
+        <jmxStatistics enabled="true"/>
+        <transaction
+                transactionManagerLookupClass="org.infinispan.transaction.lookup.JBossStandaloneJTAManagerLookup"
+                transactionMode="TRANSACTIONAL" lockingMode="PESSIMISTIC"/>
+        <locking isolationLevel="READ_COMMITTED" writeSkewCheck="false"
+                 concurrencyLevel="5000" useLockStriping="true"/>
+    </namedCache>
+
+    <namedCache name="transactionCacheWithLockingAndDeadlockDetection">
+        <jmxStatistics enabled="true"/>
+        <transaction
+                transactionManagerLookupClass="org.infinispan.transaction.lookup.JBossStandaloneJTAManagerLookup"
+                transactionMode="TRANSACTIONAL" lockingMode="PESSIMISTIC"/>
+        <locking isolationLevel="READ_COMMITTED" writeSkewCheck="false"
+                 concurrencyLevel="5000" useLockStriping="true" lockAcquisitionTimeout="20000"/>
+        <deadlockDetection enabled="true" spinDuration="1000"/>
+    </namedCache>
+
+    <namedCache name="transactionCacheWithLockingWriteSkewCheckAndVersioning">
+        <versioning enabled="true"
+                    versioningScheme="SIMPLE"/>
+        <jmxStatistics enabled="true"/>
+        <transaction
+                transactionManagerLookupClass="org.infinispan.transaction.lookup.JBossStandaloneJTAManagerLookup"
+                transactionMode="TRANSACTIONAL" lockingMode="OPTIMISTIC"/>
+        <locking isolationLevel="REPEATABLE_READ" writeSkewCheck="true"
+                 concurrencyLevel="5000" useLockStriping="true" lockAcquisitionTimeout="20000"/>
+        <deadlockDetection enabled="true" spinDuration="1000"/>
+    </namedCache>
+
+    <namedCache name="transactionCacheExample01">
+        <transaction
+                transactionManagerLookupClass="org.infinispan.transaction.lookup.GenericTransactionManagerLookup"
+                cacheStopTimeout="30000" autoCommit="true" lockingMode="OPTIMISTIC"/>
+    </namedCache>
+
+    <namedCache name="transactionCacheWithRecoveryExample">
+        <clustering mode="replication">
+            <sync replTimeout="20000"/>
+        </clustering>
+        <transaction
+                transactionManagerLookupClass="org.infinispan.transaction.lookup.JBossStandaloneJTAManagerLookup">
+            <recovery enabled="true" recoveryInfoCacheName="recoveryCache"/>
+        </transaction>
+    </namedCache>
+
+    <namedCache name="recoveryCache">
+        <transaction
+                transactionManagerLookupClass="org.infinispan.transaction.lookup.GenericTransactionManagerLookup"
+                cacheStopTimeout="30000" autoCommit="true" lockingMode="OPTIMISTIC"/>
+    </namedCache>
+
+</infinispan>

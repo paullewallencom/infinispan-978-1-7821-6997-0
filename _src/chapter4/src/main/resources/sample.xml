@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<infinispan xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:infinispan:config:7.1 http://www.infinispan.org/schemas/infinispan-config-7.1.xsd"
+	xmlns="urn:infinispan:config:7.1">
+	<jgroups>
+		<stack-file name="udp" path="default-configs/default-jgroups-udp.xml" />
+		<stack-file name="tcp" path="default-configs/default-jgroups-tcp.xml" />
+	</jgroups>
+
+	<cache-container name="SampleCacheManager" statistics="true"
+		default-cache="CacheClient_Blue" shutdown-hook="DEFAULT">
+		<transport stack="tcp" cluster="infinispan-cluster"
+			node-name="Node-A" machine="m1" rack="r1" site="Dublin" />
+
+        <jmx domain="com.packtpub" duplicate-domains="true" />
+
+		<invalidation-cache name="CacheClient_Blue" mode="SYNC"
+			remote-timeout="20000" />
+		<replicated-cache name="CacheClient_Brown" mode="ASYNC"
+			async-marshalling="true" />
+
+		<local-cache name="DefaultLocalCache" />
+
+		<invalidation-cache name="invalidatedWithClusterCacheLoaderCache"
+			mode="SYNC" remote-timeout="20000">
+			<persistence>
+				<cluster-loader remote-timeout="20000" preload="false" />
+			</persistence>
+		</invalidation-cache>
+
+		<distributed-cache name="distCache" mode="SYNC"
+			owners="3" segments="80" />
+
+
+		<distributed-cache name="cacheDistWithL1" mode="ASYNC"
+			owners="2" l1-lifespan="600000" />
+
+	</cache-container>
+</infinispan>

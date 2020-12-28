@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<infinispan xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="urn:infinispan:config:6.0 http://www.infinispan.org/schemas/infinispan-config-6.0.xsd"
+            xmlns="urn:infinispan:config:6.0">
+    <global>
+        <globalJmxStatistics enabled="true"
+                             cacheManagerName="InfinispanGuide-OGM" allowDuplicateDomains="true"/>
+        <transport clusterName="OGM_Infinispan-cluster"
+                   distributedSyncTimeout="50000" strictPeerToPeer="false">
+            <properties>
+                <property name="configurationFile" value="jgroups-tcp.xml"/>
+            </properties>
+        </transport>
+        <shutdown hookBehavior="DONT_REGISTER"/>
+    </global>
+
+    <default>
+        <clustering mode="distribution">
+            <sync replTimeout="25000"/>
+            <l1 enabled="true"/>
+        </clustering>
+
+        <transaction transactionMode="TRANSACTIONAL"
+                     transactionManagerLookupClass="org.infinispan.transaction.lookup.JBossStandaloneJTAManagerLookup">
+        </transaction>
+    </default>
+
+    <namedCache name="ENTITIES">
+        <!-- eviction strategy="LIRS" maxEntries="10" />
+        <persistence>
+            <jdbc:binaryKeyedJdbcStore xmlns="urn:infinispan:config:jdbc:6.0">
+                <connectionPool connectionUrl="jdbc:mysql://localhost:3306/infinispan"
+                    username="infinispan" password="infinispan" driverClass="com.mysql.jdbc.Driver" />
+                <binaryKeyedTable prefix="ISPN_GRID_OGM_BIN"
+                    createOnStart="true">
+                    <idColumn name="ID_ENT_TICKET" type="VARCHAR(255)" />
+                    <dataColumn name="DATA_ENT_TICKET" type="BLOB" />
+                    <timestampColumn name="TIMESTAMP_ENT" type="BIGINT" />
+                </binaryKeyedTable>
+            </jdbc:binaryKeyedJdbcStore>
+        </persistence -->
+        <persistence passivation="true">
+            <singleFile
+                    location="/tmp/infinispan_ogm_fs_v7/store"/>
+        </persistence>
+    </namedCache>
+
+    <namedCache name="ASSOCIATIONS">
+        <!--eviction strategy="LIRS" maxEntries="10" />
+        <persistence>
+            <binaryKeyedJdbcStore xmlns="urn:infinispan:config:jdbc:6.0">
+                <connectionPool connectionUrl="jdbc:mysql://localhost:3306/infinispan"
+                    username="infinispan" password="infinispan" driverClass="com.mysql.jdbc.Driver" />
+                <binaryKeyedTable prefix="ISPN_GRID_OGM_BIN"
+                    createOnStart="true">
+                    <idColumn name="ID_ASS_TICKET" type="VARCHAR(255)" />
+                    <dataColumn name="DATA_ASS_TICKET" type="BLOB" />
+                    <timestampColumn name="TIMESTAMP_ASS" type="BIGINT" />
+                </binaryKeyedTable>
+            </binaryKeyedJdbcStore>
+        </persistence-->
+        <persistence passivation="true">
+            <singleFile
+                    location="/tmp/infinispan_ogm_fs_v7/store"/>
+        </persistence>
+    </namedCache>
+
+    <namedCache name="IDENTIFIERS">
+        <!--eviction strategy="LIRS" maxEntries="1" />
+        <persistence>
+            <binaryKeyedJdbcStore xmlns="urn:infinispan:config:jdbc:6.0">
+                <connectionPool connectionUrl="jdbc:mysql://localhost:3306/infinispan"
+                    username="infinispan" password="infinispan" driverClass="com.mysql.jdbc.Driver" />
+                <binaryKeyedTable prefix="ISPN_GRID_OGM_BIN"
+                    createOnStart="true">
+                    <idColumn name="ID_IDENT_TICKET" type="VARCHAR(255)" />
+                    <dataColumn name="DATA_IDENT_TICKET" type="BLOB" />
+                    <timestampColumn name="TIMESTAMP_IDENT" type="BIGINT" />
+                </binaryKeyedTable>
+            </binaryKeyedJdbcStore>
+        </persistence-->
+        <persistence passivation="true">
+            <singleFile
+                    location="/tmp/infinispan_ogm_fs_v7/store"/>
+        </persistence>
+    </namedCache>
+</infinispan>

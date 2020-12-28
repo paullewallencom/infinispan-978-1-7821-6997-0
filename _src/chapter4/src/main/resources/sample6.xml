@@ -1,0 +1,72 @@
+<infinispan>
+    <global>
+        <globalJmxStatistics
+                enabled="true"
+                jmxDomain="com.packtpub.infinispan"
+                cacheManagerName="PacktCacheManager"/>
+        <transport
+                clusterName="packt-cluster"
+                machineId="infinispan-server1"
+                rackId="rack101" nodeName="N1023"/>
+    </global>
+    <default>
+        <clustering mode="replication">
+            <stateTransfer chunkSize="0" fetchInMemoryState="true"
+                           timeout="240000"/>
+            <sync replTimeout="20000"/>
+        </clustering>
+
+    </default>
+
+    <namedCache name="invalidatedWithClusterCacheLoaderCache">
+        <clustering mode="invalidation">
+            <sync replTimeout="20000"/>
+        </clustering>
+
+        <!--persistence>
+            <store class="ClusterLoader" preload="false">
+                <properties>
+                    <property name="remoteCallTimeout" value="20000" />
+                </properties>
+            </store>
+        </persistence-->
+    </namedCache>
+
+    <namedCache name="cacheDistWithL1">
+        <clustering mode="dist">
+            <async/>
+            <hash numOwners="2"/>
+            <l1 enabled="true" lifespan="1000000" invalidationThreshold="1"/>
+        </clustering>
+    </namedCache>
+
+    <namedCache name="persistentCache">
+        <persistence>
+            <store class="org.infinispan.persistence.file.SingleFileStore"
+                   fetchPersistentState="true" purgeOnStartup="true"
+                   ignoreModifications="false" shared="false">
+                <async enabled="true" flushLockTimeout="12321"
+                       shutdownTimeout="321" modificationQueueSize="123" threadPoolSize="23"/>
+                <properties>
+                    <property name="location" value="/tmp/cache/backup"/>
+                </properties>
+            </store>
+        </persistence>
+    </namedCache>
+
+    <namedCache name="writeBehindCache">
+        <persistence>
+            <store class="org.infinispan.persistence.file.SingleFileStore"
+                   fetchPersistentState="true" ignoreModifications="false"
+                   purgeOnStartup="false" shared="false">
+                <properties>
+                    <property name="location" value="/tmp/cache/backup"/>
+                </properties>
+                <!-- write-behind configuration starts here -->
+                <async enabled="true" threadPoolSize="10"/>
+                <!-- write-behind configuration ends here -->
+            </store>
+        </persistence>
+    </namedCache>
+
+</infinispan>

@@ -1,0 +1,151 @@
+<infinispan>
+	<global>
+
+		<!-- Configuring the executor service in the global section to emit notifications 
+			to asynchronous listeners. -->
+
+		<asyncListenerExecutor
+			factory="org.infinispan.executors.DefaultExecutorFactory">
+			<properties>
+				<property name="maxThreads" value="20" />
+				<property name="queueSize" value="10000" />
+				<property name="threadNamePrefix" value="AsyncListenerThread" />
+			</properties>
+		</asyncListenerExecutor>
+
+		<!-- Configuring the asynchronous transport executor for asynchronous work 
+			on the Transport. -->
+
+		<asyncTransportExecutor
+			factory="org.infinispan.executors.DefaultExecutorFactory">
+			<properties>
+				<property name="maxThreads" value="25" />
+				<property name="queueSize" value="10000" />
+				<property name="threadNamePrefix" value="AsyncSerializationThread" />
+			</properties>
+		</asyncTransportExecutor>
+
+		<!-- Configuring the Executor Service to execute remote commands -->
+		<remoteCommandsExecutor
+			factory="org.infinispan.executors.DefaultExecutorFactory">
+			<properties>
+				<property name="maxThreads" value="50" />
+				<property name="coreThreads" value="5" />
+				<property name="keepAliveTime" value="15000" />
+				<property name="threadNamePrefix" value="RemoteCommandThread" />
+			</properties>
+		</remoteCommandsExecutor>
+
+		<!-- Changing the Thread name prefix of the executor used by the eviction 
+			process. -->
+		<evictionScheduledExecutor
+			factory="org.infinispan.executors.DefaultScheduledExecutorFactory">
+			<properties>
+				<property name="threadNamePrefix" value="EvictionThread" />
+			</properties>
+		</evictionScheduledExecutor>
+
+		<!-- Changing the Thread name prefix of the scheduled executor used to 
+			periodically flush replication queues. -->
+		<replicationQueueScheduledExecutor
+			factory="org.infinispan.executors.DefaultScheduledExecutorFactory">
+			<properties>
+				<property name="threadNamePrefix" value="ReplicationQueueThread" />
+			</properties>
+		</replicationQueueScheduledExecutor>
+
+		<!-- Configuring the number of threads, queue size and thread name prefix 
+			of the total order executor service. -->
+		<totalOrderExecutor factory="org.infinispan.executors.DefaultExecutorFactory">
+			<properties>
+				<property name="threadNamePrefix" value="TotalOrderValidatorThread" />
+				<property name="coreThreads" value="1" />
+				<property name="maxThreads" value="16" />
+				<property name="queueSize" value="0" />
+				<property name="keepAliveTime" value="1000" />
+			</properties>
+		</totalOrderExecutor>
+
+        <globalJmxStatistics
+                enabled="true"
+                jmxDomain="com.packt.infinispan"
+                allowDuplicateDomains="true"
+                cacheManagerName="SampleCacheManager"/>
+
+		<!-- Changing transport settings. -->
+		<transport clusterName="infinispan-cluster"
+			distributedSyncTimeout="50000" nodeName="PacketPub" machineId="m1"
+			rackId="r1" siteId="s1">
+			<properties>
+				<property name="configurationFile" value="jgroups-udp.xml" />
+			</properties>
+		</transport>
+
+
+		<!-- Enabling the global JMX statistics for the given cache manager and 
+			customizing the jmx domain name. > <globalJmxStatistics enabled="true" jmxDomain="PacktDomain" 
+			mBeanServerLookup="org.infinispan.jmx.JBossMBeanServerLookup" allowDuplicateDomains="true" 
+			/ -->
+
+		<shutdown hookBehavior="DEFAULT" />
+
+	</global>
+
+	<default>
+		<locking concurrencyLevel="100" lockAcquisitionTimeout="1000" />
+
+		<transaction transactionMode="NON_TRANSACTIONAL"
+			reaperWakeUpInterval="123" completedTxTimeout="3123" />
+
+		<!-- jmxStatistics enabled="false" / -->
+
+		<!-- dataContainer keyEquivalence="org.jboss.as.clustering.infinispan.equivalence.AnyServerEquivalence" 
+			valueEquivalence="org.jboss.as.clustering.infinispan.equivalence.AnyServerEquivalence" 
+			/ > <dataContainer keyEquivalence="org.infinispan.commons.equivalence.ByteArrayEquivalence" 
+			valueEquivalence="org.infinispan.commons.equivalence.ByteArrayEquivalence" 
+			/ -->
+
+	</default>
+
+    <namedCache name="TreeCache">
+        <invocationBatching enabled="true" />
+        <jmxStatistics enabled="true"/>
+        <transaction transactionMode="TRANSACTIONAL" lockingMode="PESSIMISTIC" />
+    </namedCache>
+
+    <namedCache name="CacheClient_Blue">
+		<clustering mode="invalidation">
+			<sync replTimeout="20000" />
+		</clustering>
+	</namedCache>
+
+	<namedCache name="CacheClient_Brown">
+		<clustering mode="replication">
+			<async asyncMarshalling="true" />
+		</clustering>
+	</namedCache>
+
+	<namedCache name="EvictionCache">
+		<eviction maxEntries="2000" strategy="LIRS" threadPolicy="PIGGYBACK" />
+	</namedCache>
+
+	<namedCache name="ExpirationCache">
+		<expiration lifespan="9999" maxIdle="2999" />
+	</namedCache>
+
+	<namedCache name="EvictionAndPassivationCache">
+		<eviction maxEntries="10" strategy="LRU" />
+		<expiration wakeUpInterval="500" lifespan="60000" maxIdle="1000" />
+		<persistence passivation="true">
+			<store class="org.infinispan.persistence.file.SingleFileStore"
+            fetchPersistentState="false" preload="true" shared="false"
+            purgeOnStartup="true" ignoreModifications="false">
+            <async enabled="true" flushLockTimeout="12321" shutdownTimeout="321" modificationQueueSize="123" threadPoolSize="23"/>
+				<properties>
+					<property name="location" value="/tmp/cache/backup" />
+				</properties>
+			</store>
+		</persistence>
+	</namedCache>
+
+</infinispan>

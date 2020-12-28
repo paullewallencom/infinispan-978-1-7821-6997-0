@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<infinispan xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="urn:infinispan:config:7.1 http://www.infinispan.org/schemas/infinispan-config-7.1.xsd"
+	xmlns="urn:infinispan:config:7.1">
+	<jgroups>
+		<stack-file name="udp" path="default-configs/default-jgroups-udp.xml" />
+		<stack-file name="tcp" path="default-configs/default-jgroups-tcp.xml" />
+	</jgroups>
+
+	<cache-container name="SampleCacheManager" statistics="true"
+		default-cache="CacheClient_Blue" shutdown-hook="DEFAULT">
+
+		<transport stack="tcp" cluster="infinispan-cluster"
+			node-name="Node-A" machine="m1" rack="r1" site="Dublin" />
+
+        <jmx domain="com.packtpub" duplicate-domains="true" />
+
+        <local-cache name="TreeCache">
+            <transaction
+                    mode="BATCH" locking="PESSIMISTIC" />
+        </local-cache>
+
+		<invalidation-cache name="CacheClient_Blue" mode="SYNC"
+			remote-timeout="20000" />
+
+		<replicated-cache name="CacheClient_Brown" mode="ASYNC"
+			async-marshalling="true" />
+
+		<local-cache name="EvictionCache">
+			<eviction max-entries="2000" strategy="LIRS" thread-policy="PIGGYBACK" />
+		</local-cache>
+
+		<local-cache name="ExpirationCache">
+			<expiration lifespan="9999" max-idle="2999" />
+		</local-cache>
+
+
+		<local-cache name="EvictionAndPassivationCache">
+			<eviction max-entries="10" strategy="LRU" />
+			<expiration interval="500" lifespan="60000" max-idle="999" />
+			<persistence passivation="true">
+				<file-store path="/tmp/cache/backup" />
+			</persistence>
+		</local-cache>
+
+	</cache-container>
+</infinispan>
